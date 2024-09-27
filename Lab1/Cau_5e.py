@@ -3,17 +3,17 @@ money = float(input('Nhập số tiền (VND): '))
 while money <= 0:
   money = float(input('Số tiền không hợp lệ !!!\nMời bạn nhập lại: '))
 
-day = int(input("Nhập số ngày gửi: "))
+month = int(input("Nhập số tháng: "))
 
-while day <= 0:
-  day = int(input("Số ngày không hợp lệ !!!\nMời bạn nhập lại: "))
+while month <= 0:
+  month = int(input("Số tháng không hợp lệ !!!\nMời bạn nhập lại: "))
 
-match money:
-  case money if 0 < money < 10000000:
-    LaiXuat = money * 0.05 * (day/365)
-  case money if 10000000 < money < 20000000:
-    LaiXuat = money * 0.07 * (day/365)
-  case money if money > 20000000:
-    LaiXuat = money * 0.1 * (day/365)
+match month:
+  case month if 0 < month < 6:
+    LaiSuat = money * 0.05
+  case month if 6 <= month < 12:
+    LaiSuat = month * 0.07
+  case month if month >= 12:
+    LaiSuat = month * 0.1
    
-print(f"Lãi xuất sau {day} ngày gửi là: {round(LaiXuat,4)} VND")
+print(f"Lãi suất sau {month} tháng gửi là: {round(LaiSuat,4)} VND")
