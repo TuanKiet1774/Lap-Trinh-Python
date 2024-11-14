@@ -21,8 +21,7 @@ def generate_block_map():
 # Sử dụng hàm để tạo BLOCK_MAP
 BLOCK_MAP = generate_block_map()
 
-COLOR_LEGEND = {'1': 'blue', '2': 'green', '3': 'red',	'4': 'orange',	
-                '5': 'purple',	'6': 'bronce',	'7': 'grey',}
+COLOR_LEGEND = {'1': 'blue', '2': 'green', '3': 'red',	'4': 'orange', '5': 'purple', '6': 'bronce', '7': 'grey',}
 
 GAP_SIZE = 2
 BLOCK_HEIGHT = WINDOW_HEIGHT / len(BLOCK_MAP) - GAP_SIZE
