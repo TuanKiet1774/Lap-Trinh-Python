@@ -1,5 +1,5 @@
 #Lớp Transaction là các giao dịch 
-from account import Account
+from account import *
 class Transaction:
   def __init__(self, transaction_id, account, type, amount):
     self.transaction_id = transaction_id

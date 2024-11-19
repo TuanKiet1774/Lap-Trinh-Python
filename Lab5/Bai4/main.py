@@ -18,19 +18,11 @@ order2 = Order(order_id="DH002", customer=customer2)
 
 # Thêm sản phẩm vào đơn hàng
 order1.add_product(bread, 2)  # Thêm 2 bánh mì
-order1.add_product(noodle, 3)  # Thêm 3 hộp sữa
-order2.add_product(noodle, 3)  # Thêm 3 hộp sữa
+order1.add_product(noodle, 3)  # Thêm 3 mì gói
+order2.add_product(noodle, 3)  # Thêm 3 mì gói
 
 #Thông tin các đơn hàng
 print(order1)
 print(order2)
 
-# Cập nhật kho hàng sau khi tạo đơn hàng
-bread.update_stock(-2)  # Giảm 2 sản phẩm bánh mì
-noodle.update_stock(-6)  # Giảm 3 sản phẩm sữa
-
-# Hiển thị lại thông tin sản phẩm sau khi cập nhật kho
-print("\nThông tin sản phẩm sau khi cập nhật kho:")
-print(bread)
-print(milk)
 print(noodle)

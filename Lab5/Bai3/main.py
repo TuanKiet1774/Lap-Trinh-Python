@@ -21,3 +21,4 @@ bank.process_transaction(transaction3)
 bank.list_accounts()
 bank.list_transactions()
 
+print(account1)
