@@ -129,14 +129,17 @@ class Ball(pygame.sprite.Sprite):
   
 		self.pos = pygame.math.Vector2(self.rect.topleft)
 		self.direction = pygame.math.Vector2((choice((1,-1)),-1))
-  
-		self.speed = 400
 
+		self.speed = 350
+		self.level = 1
+		self.speed_up_timer = 0  # Đếm thời gian từ lần tăng tốc gần nhất
+		self.speed_up_interval = 30
+		self.score = 0
+  
 		# active
 		self.active = False
 
 		# sounds
-
 		self.impact_sound = pygame.mixer.Sound('./sounds/impact.wav')
 		self.impact_sound.set_volume(0.1)
 
@@ -190,6 +193,7 @@ class Ball(pygame.sprite.Sprite):
 
 					if getattr(sprite,'health',None):
 						sprite.get_damage(1)
+						self.score +=1
 
 
 			if direction == 'vertical':
@@ -208,6 +212,7 @@ class Ball(pygame.sprite.Sprite):
 
 					if getattr(sprite,'health',None):
 						sprite.get_damage(1)
+						self.score +=1
 
 	def update(self,dt):
 		if self.active:
@@ -215,6 +220,13 @@ class Ball(pygame.sprite.Sprite):
 			if self.direction.magnitude() != 0:
 				self.direction = self.direction.normalize()
 
+			self.speed_up_timer += dt
+			# Kiểm tra nếu đã đủ 20 giây để tăng tốc
+			if self.speed_up_timer >= self.speed_up_interval:
+				self.speed_up_timer = 0  # Reset thời gian đếm
+				if self.speed < 550:
+					self.speed *= 1.1
+					self.level +=1
 			# create old rect
 			self.old_rect = self.rect.copy()
 
@@ -232,7 +244,8 @@ class Ball(pygame.sprite.Sprite):
 		else:
 			self.rect.midbottom = self.player.rect.midtop
 			self.pos = pygame.math.Vector2(self.rect.topleft)
-
+		self.speed_up_timer += dt
+				
 class Block(pygame.sprite.Sprite):
 	def __init__(self,block_type,pos,groups,surfacemaker,create_upgrade):
 		super().__init__(groups)
@@ -240,20 +253,19 @@ class Block(pygame.sprite.Sprite):
 		self.image = self.surfacemaker.get_surf(COLOR_LEGEND[block_type],(BLOCK_WIDTH, BLOCK_HEIGHT))
 		self.rect = self.image.get_rect(topleft = pos)
 		self.old_rect = self.rect.copy()
-
+		
 		# damage information
 		self.health = int(block_type)
-
 		# upgrade
 		self.create_upgrade = create_upgrade
 
 	def get_damage(self,amount):
 		self.health -= amount
-
 		if self.health > 0:
 			self.image = self.surfacemaker.get_surf(COLOR_LEGEND[str(self.health)],(BLOCK_WIDTH, BLOCK_HEIGHT))
 		else:
 			if randint(0,10) < 9:
 				self.create_upgrade(self.rect.center)
 			self.kill()
+			
    

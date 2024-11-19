@@ -2,8 +2,7 @@ import pygame, sys, time
 from settings import *
 from sprites import Player, Ball, Block, Upgrade, Projectile
 from surfacemaker import SurfaceMaker
-from random import choice, randint
-
+from random import choice
 class Game:
   def __init__(self):
     pygame.init()
@@ -15,6 +14,10 @@ class Game:
     self.upgrade_sprites = pygame.sprite.Group()
     self.projectile_sprites = pygame.sprite.Group()
     self.surfacemaker = SurfaceMaker()
+    file = open('highscore.txt', 'r')
+    read = file.readlines()
+    self.first_highscore = int(read[0])
+    self.highscore = self.first_highscore
     self.reset_game()
 
   def reset_game(self):
@@ -36,10 +39,11 @@ class Game:
     self.powerup_sound.set_volume(0.1)
     self.laserhit_sound = pygame.mixer.Sound('./sounds/laser_hit.wav')
     self.laserhit_sound.set_volume(0.02)
+    self.display_highscore()
     self.music = pygame.mixer.Sound('./sounds/music.wav')
     self.music.set_volume(0.1)
     self.music.play(loops=-1)
-
+   
   def create_upgrade(self, pos):
     upgrade_type = choice(UPGRADES)
     Upgrade(pos, upgrade_type, [self.all_sprites, self.upgrade_sprites])
@@ -67,7 +71,22 @@ class Game:
     for i in range(self.player.hearts):
       x = (text_surface.get_width() + 10) + i * (self.heart_surf.get_width() + 2)
       self.display_surface.blit(self.heart_surf, (x, 4))
-
+  
+  def display_level(self):
+    font = pygame.font.Font('Fonts/SVN-Determination Sans.otf', 20)
+    text_surface2 = font.render(f"Level:  {self.ball.level}", True, (255, 255, 255))
+    self.display_surface.blit(text_surface2, (200, 0))
+  
+  def display_score(self):
+    font = pygame.font.Font('Fonts/SVN-Determination Sans.otf', 20)
+    text_surface3 = font.render(f"Score: {self.ball.score}", True, (255, 255, 255))
+    self.display_surface.blit(text_surface3, (400, 0))
+  
+  def display_highscore(self):
+    font = pygame.font.Font('Fonts/SVN-Determination Sans.otf', 20)
+    text_surface3 = font.render(f"HighScore: {self.highscore}", True, (255, 255, 255))
+    self.display_surface.blit(text_surface3, (600, 0))
+  
   def upgrade_collision(self):
     overlap_sprites = pygame.sprite.spritecollide(self.player, self.upgrade_sprites, True)
     for sprite in overlap_sprites:
@@ -77,10 +96,7 @@ class Game:
   def create_projectile(self):
     self.laser_sound.play()
     for projectile in self.player.laser_rects:
-      Projectile(
-        projectile.midtop - pygame.math.Vector2(0, 30),
-        self.projectile_surf,
-        [self.all_sprites, self.projectile_sprites])
+      Projectile(projectile.midtop - pygame.math.Vector2(0, 30), self.projectile_surf, [self.all_sprites, self.projectile_sprites])
 
   def laser_timer(self):
     if pygame.time.get_ticks() - self.shoot_time >= 500:
@@ -92,6 +108,7 @@ class Game:
       if overlap_sprites:
         for sprite in overlap_sprites:
           sprite.get_damage(1)
+          self.ball.score +=1
         projectile.kill()
         self.laserhit_sound.play()
 
@@ -134,7 +151,7 @@ class Game:
     while True:
       dt = time.time() - last_time
       last_time = time.time()
-
+      
       for event in pygame.event.get():
         if event.type == pygame.QUIT:
           pygame.quit()
@@ -147,9 +164,16 @@ class Game:
               self.can_shoot = False
               self.shoot_time = pygame.time.get_ticks()
 
-      if self.player.hearts <= 0:
+      if self.player.hearts <= 0:       
+        if self.ball.score > self.highscore:
+          self.file = open('highscore.txt', 'w')
+          self.write_score = str(self.ball.score)
+          self.file.write(self.write_score)
+          self.file.close()
+          self.first_highscore = self.ball.score
+          self.highscore = self.ball.score #Tự cập nhật nếu người dùng reset thay vì exit 
         self.game_over_screen()
-
+      
       self.display_surface.blit(self.bg, (0, 0))
       self.all_sprites.update(dt)
       self.upgrade_collision()
@@ -157,6 +181,9 @@ class Game:
       self.projectile_block_collision()
       self.all_sprites.draw(self.display_surface)
       self.display_hearts()
+      self.display_level()
+      self.display_score()
+      self.display_highscore()
       pygame.display.update()
 
 if __name__ == '__main__':
